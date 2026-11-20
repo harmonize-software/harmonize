@@ -28,7 +28,7 @@ NUMBA_HIP_REPOSITORY_RELEASES = (
     (7, 2, 0), (7, 2, 1), (7, 2, 2),
 )
 
-# CUDA major versions with a `harmonize[cudaNN]` install extra (pyproject.toml)
+# CUDA major versions with a `harmonize-python[cudaNN]` install extra (pyproject.toml)
 CUDA_EXTRAS = (12, 13)
 
 
@@ -338,7 +338,7 @@ def check_cuda(info, findings):
     if toolkit is not None and bindings is not None:
         if int(bindings.split(".")[0]) != toolkit[0]:
             if toolkit[0] in CUDA_EXTRAS:
-                hint = f"Install the matching extra: `pip install harmonize[cuda{toolkit[0]}]`."
+                hint = f"Install the matching extra: `pip install 'harmonize-python[cuda{toolkit[0]}]'`."
             else:
                 hint = (
                     "Use a CUDA toolkit whose major version matches cuda-bindings "
@@ -416,10 +416,10 @@ def run_checks(info):
         if requested == "rocm":
             hint = numba_hip_install_hint(info["rocm"]["rocm_version"])
         elif requested == "cuda":
-            hint = "Install the CUDA backend: `pip install harmonize[cuda12]` or `harmonize[cuda13]`."
+            hint = "Install the CUDA backend: `pip install 'harmonize-python[cuda12]'` or `'harmonize-python[cuda13]'`."
         else:
             hint = (
-                "For NVIDIA GPUs: `pip install harmonize[cuda12]` or `harmonize[cuda13]`.\n"
+                "For NVIDIA GPUs: `pip install 'harmonize-python[cuda12]'` or `'harmonize-python[cuda13]'`.\n"
                 + numba_hip_install_hint(info["rocm"]["rocm_version"])
             )
         reasons = "; ".join(
