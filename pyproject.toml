@@ -48,11 +48,15 @@ dependencies = [
 # Harmonize also needs that version's nvcc (from the system, a module, or
 # conda's cuda-nvcc).
 #
+# numba-cuda 0.30.4 (the latest) uses np.row_stack, which NumPy 2.5 removed:
+# it fails to import with NumPy 2.5, which pip picks on Python 3.12 and later.
+# Raise the cap once a numba-cuda release supports NumPy 2.5.
+#
 # AMD's numba-hip is installed separately for a specific
 # ROCm release; `python -m harmonize check` prints the command.
 [project.optional-dependencies]
-cuda12 = ["numba-cuda[cu12]>=0.30"]
-cuda13 = ["numba-cuda[cu13]>=0.30"]
+cuda12 = ["numba-cuda[cu12]>=0.30", "numpy<2.5"]
+cuda13 = ["numba-cuda[cu13]>=0.30", "numpy<2.5"]
 dev = ["black"]
 
 [project.urls]
