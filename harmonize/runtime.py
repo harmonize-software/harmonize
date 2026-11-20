@@ -1271,7 +1271,7 @@ class RuntimeSpec():
 
                 comp_cmd = [
                     f"{config.nvcc_path()} -dlink {' '.join(link_list)} -arch=sm_{RuntimeSpec.gpu_arch} --cudart shared -o {dev_path} --compiler-options -fPIC {RuntimeSpec.debug_flag}",
-                    f"{config.nvcc_path()} -shared {' '.join(link_list)} {dev_path} -arch=sm_{RuntimeSpec.gpu_arch} --cudart shared -o {so_path} {RuntimeSpec.debug_flag}"
+                    f"{config.nvcc_path()} -shared {' '.join(link_list)} {dev_path} -arch=sm_{RuntimeSpec.gpu_arch} {config.cuda_runtime_link_flags()} -o {so_path} {RuntimeSpec.debug_flag}"
                 ]
                 comp_desc = [
                     f"Linking device code",

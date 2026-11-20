@@ -1,3 +1,4 @@
+import glob
 import numba
 import shutil
 import subprocess
@@ -180,6 +181,23 @@ def nvcc_path():
         return "nvcc"
     else:
         return CUDA_PATH + "/bin/nvcc"
+
+def cuda_runtime_link_flags():
+    """nvcc options that link the CUDA runtime library into a shared object.
+
+    Usually `--cudart shared`, which links libcudart.so. CUDA installed with pip
+    (in site-packages/nvidia/cuNN/) ships only the versioned libcudart.so.NN
+    beside its nvcc, so link that file by name, and record its directory in the
+    result so that it loads without LD_LIBRARY_PATH.
+    """
+    nvcc = shutil.which(nvcc_path())
+    if nvcc is not None:
+        lib = path.join(path.dirname(path.dirname(path.realpath(nvcc))), "lib")
+        versioned = glob.glob(path.join(lib, "libcudart.so.[0-9]*"))
+        if versioned and not path.exists(path.join(lib, "libcudart.so")):
+            name = path.basename(min(versioned, key=len))  # libcudart.so.NN
+            return f"--cudart none -L{lib} -l:{name} -Xlinker -rpath={lib}"
+    return "--cudart shared"
 
 def hipcc_path():
     if ROCM_PATH == None:
