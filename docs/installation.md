@@ -50,14 +50,19 @@ pip install "harmonize-python[cuda13]"   # or harmonize-python[cuda12]
 
 :::{tab-item} AMD
 :sync: amd
-Install the version of AMD's Numba fork, `numba-hip`, for your ROCm release
-(here, ROCm 6.4.0), then Harmonize:
+Install AMD's Numba backend, `numba-hip`, built for your ROCm release, then
+Harmonize. For ROCm 6.3.0 to 7.2.2, `numba-hip` comes from AMD's original
+repository (here, for ROCm 7.2.1):
 
 ```sh
 pip install --extra-index-url https://test.pypi.org/simple \
-    "numba-hip[rocm-6-4-0] @ git+https://github.com/ROCm/numba-hip.git"
+    "numba-hip[rocm-7-2-1] @ git+https://github.com/ROCm/numba-hip.git"
 pip install harmonize-python
 ```
+
+For newer ROCm releases, AMD publishes `numba-hip` on PyPI
+(`pip install numba-hip`). `python -m harmonize check` prints the command for
+the ROCm you have loaded.
 :::
 ::::
 

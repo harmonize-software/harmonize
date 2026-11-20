@@ -67,7 +67,7 @@ Python bindings require:
   - For CUDA:
     - [`numba`](https://github.com/numba/numba)
   - For ROCM:
-    - [the AMD fork of `numba`](https://github.com/ROCm/numba-hip)
+    - [`numba-hip`](https://github.com/ROCm/hip-python), AMD's Numba backend
 
 
 ## Installation
@@ -84,14 +84,19 @@ pip install "harmonize-python[cuda13]"   # or harmonize-python[cuda12]
 That version's `nvcc` must also be available from the system, an environment
 module (`module load cuda`), or conda (`conda install -c nvidia cuda-nvcc`).
 
-For AMD GPUs, install ROCm and the corresponding version of `numba-hip` for
-your ROCm release (here, ROCm 6.4.0):
+For AMD GPUs, install ROCm and the `numba-hip` build for your ROCm release.
+For ROCm 6.3.0 to 7.2.2, install it from AMD's original repository (here, for
+ROCm 7.2.1):
 
 ```sh
 pip install --extra-index-url https://test.pypi.org/simple \
-    "numba-hip[rocm-6-4-0] @ git+https://github.com/ROCm/numba-hip.git"
+    "numba-hip[rocm-7-2-1] @ git+https://github.com/ROCm/numba-hip.git"
 pip install harmonize-python
 ```
+
+For newer ROCm releases, AMD publishes `numba-hip` on PyPI
+(`pip install numba-hip`). `python -m harmonize check` prints the command for
+the ROCm you have loaded.
 
 To install from a clone of this repository instead, run
 `pip install ".[cuda13]"` (or `pip install .` for AMD) in it; add `-e` to
