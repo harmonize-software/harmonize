@@ -17,7 +17,16 @@ from importlib import metadata
 from harmonize import config
 
 
+# AMD's Numba backend. This repository has builds (install extras) for the
+# ROCm releases below; newer releases of numba-hip are developed in
+# ROCm/hip-python and published on PyPI.
 NUMBA_HIP_REPOSITORY = "https://github.com/ROCm/numba-hip.git"
+NUMBA_HIP_REPOSITORY_RELEASES = (
+    (6, 3, 0), (6, 3, 1), (6, 3, 2), (6, 3, 3),
+    (6, 4, 0), (6, 4, 1), (6, 4, 2), (6, 4, 3), (6, 4, 4),
+    (7, 0, 0), (7, 0, 1), (7, 0, 2), (7, 1, 0), (7, 1, 1),
+    (7, 2, 0), (7, 2, 1), (7, 2, 2),
+)
 
 # CUDA major versions with a `harmonize[cudaNN]` install extra (pyproject.toml)
 CUDA_EXTRAS = (12, 13)
@@ -74,20 +83,24 @@ def selected_platform():
 
 
 def detect_rocm_version(rocm_path):
-    """Best-effort ROCm version from hipconfig or the install's version file."""
-    version = parse_version(
+    """Best-effort ROCm version: (major, minor, patch) from the install's
+    version file or directory name (/opt/rocm-7.2.1), else (major, minor) from
+    hipconfig, whose patch number is HIP's rather than ROCm's."""
+    if rocm_path is not None:
+        texts = [os.path.basename(os.path.realpath(rocm_path))]
+        try:
+            with open(os.path.join(rocm_path, ".info", "version")) as file:
+                texts.insert(0, file.read())
+        except OSError:
+            pass
+        for text in texts:
+            match = re.search(r"(\d+)\.(\d+)\.(\d+)", text)
+            if match:
+                return tuple(int(part) for part in match.groups())
+    return parse_version(
         run_text([shutil.which("hipconfig") or "hipconfig", "--version"]),
         r"(\d+)\.(\d+)",
     )
-    if version is not None:
-        return version
-    if rocm_path is not None:
-        try:
-            with open(os.path.join(rocm_path, ".info", "version")) as file:
-                return parse_version(file.read(), r"(\d+)\.(\d+)")
-        except OSError:
-            pass
-    return None
 
 
 def detect_cuda_version(nvcc):
@@ -253,13 +266,27 @@ class Finding:
 
 
 def numba_hip_install_hint(rocm_version):
-    if rocm_version is None:
-        key = "rocm-<major>-<minor>-<patch>"
-    else:
-        key = f"rocm-{rocm_version[0]}-{rocm_version[1]}-<patch>"
+    """How to install numba-hip for ROCm `rocm_version` (a tuple, or None)."""
+    repository = (
+        'pip install --extra-index-url https://test.pypi.org/simple '
+        '"numba-hip[rocm-{key}] @ git+' + NUMBA_HIP_REPOSITORY + '"'
+    )
+    pypi = (
+        "pip install numba-hip   # built for AMD's newer ROCm packaging; may not "
+        "load with other ROCm installs"
+    )
+    if rocm_version in NUMBA_HIP_REPOSITORY_RELEASES:
+        command = repository.format(key="-".join(str(part) for part in rocm_version))
+        return f"Install AMD's Numba HIP backend for ROCm {format_version(rocm_version)}:\n    {command}"
+    if rocm_version is not None and len(rocm_version) == 3 and rocm_version > NUMBA_HIP_REPOSITORY_RELEASES[-1]:
+        return f"Install AMD's Numba HIP backend for ROCm {format_version(rocm_version)}:\n    {pypi}"
     return (
-        "Install AMD's Numba HIP backend for your ROCm release, e.g.\n"
-        f'    pip install --extra-index-url https://test.pypi.org/simple "numba-hip[{key}] @ git+{NUMBA_HIP_REPOSITORY}"'
+        "Install AMD's Numba HIP backend for your ROCm release X.Y.Z. For ROCm "
+        f"{format_version(NUMBA_HIP_REPOSITORY_RELEASES[0])} to "
+        f"{format_version(NUMBA_HIP_REPOSITORY_RELEASES[-1])}:\n    "
+        + repository.format(key="X-Y-Z")
+        + "\nFor newer ROCm releases:\n    "
+        + pypi
     )
 
 
