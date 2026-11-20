@@ -806,7 +806,7 @@ class RuntimeSpec():
                 for term in rep_list:
                     ir_text = re.sub( \
                         f'(?P<before>[^a-zA-Z0-9_])(?P<name>{term})(?P<after>[^a-zA-Z0-9_])', \
-                        f"\g<before>\g<name>_{suffix}\g<after>", \
+                        rf"\g<before>\g<name>_{suffix}\g<after>", \
                         ir_text \
                     )
                 ir_file = open(ir_path,mode='a+')
