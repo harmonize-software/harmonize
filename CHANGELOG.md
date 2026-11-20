@@ -3,6 +3,35 @@
 Notable changes to Harmonize. Versions follow [semantic versioning](https://semver.org/);
 before 1.0, a minor version (0.x.0) may include breaking changes.
 
+## Unreleased
+
+Tested on NVIDIA A30 (CUDA) and AMD MI300A (ROCm 7.2.1), where MC/DC's GPU
+regression tests pass.
+
+### Fixed
+
+- Python 3.13 and later: loading a program whose device state has an array
+  field raised `NameError`, as did the host/device memcpy functions. Generated
+  functions are now defined in an explicit namespace (PEP 667 changed
+  `locals()`).
+- Programs now link with CUDA installed only from pip, which ships
+  `libcudart.so.NN` but not `libcudart.so` ("cannot find -lcudart").
+- The CUDA extras keep NumPy below 2.5: numba-cuda 0.30.4 fails to import with
+  NumPy 2.5, which pip otherwise picks on Python 3.12 and later.
+- `python -m harmonize check` gave `pip install harmonize[cuda13]`, which
+  installs an unrelated package; it now names `harmonize-python`.
+- A regex replacement string no longer raises a `SyntaxWarning` (an invalid
+  escape sequence) on Python 3.12 and later.
+- The `barrier_demo` C++ example compiles with hipcc.
+
+### Changed
+
+- `python -m harmonize check` gives the numba-hip install command for the ROCm
+  release in use: from AMD's original repository for ROCm 6.3.0 to 7.2.2, or
+  from PyPI for newer releases. It reads ROCm's own version, not HIP's.
+- The tests run on the GPU platform Harmonize selects, CUDA or ROCm. Their
+  `--require nvcc` option is now `--require compiler` (nvcc or hipcc).
+
 ## 0.1.0 (2026-11-18)
 
 ### Changed (breaking)
