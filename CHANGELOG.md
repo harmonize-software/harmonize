@@ -3,7 +3,7 @@
 Notable changes to Harmonize. Versions follow [semantic versioning](https://semver.org/);
 before 1.0, a minor version (0.x.0) may include breaking changes.
 
-## Unreleased
+## 0.1.1 (2026-11-20)
 
 Tested on NVIDIA A30 (CUDA) and AMD MI300A (ROCm 7.2.1), where MC/DC's GPU
 regression tests pass.
