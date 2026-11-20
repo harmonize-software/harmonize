@@ -28,14 +28,4 @@ pytest --require compiler --require gpu tests
 nvcc must come from the same CUDA release as Numba's NVVM, and no newer than
 the driver supports (`python -m harmonize check` tests both). With CUDA 13 from
 pip, `pip install "cuda-toolkit[nvcc]==13.*"` installs a matching nvcc into
-`site-packages/nvidia/cu13/bin`. That release ships `libcudart.so.13` but not
-`libcudart.so`, which linking a Harmonize program needs; point the linker at
-it with a symbolic link:
-
-```sh
-mkdir -p ~/cudart-link
-ln -sf "$(python -c 'import nvidia; print(nvidia.__path__[0])')/cu13/lib/libcudart.so.13" ~/cudart-link/libcudart.so
-export LIBRARY_PATH=~/cudart-link
-```
-
-A conda `cuda-nvcc` or a system CUDA toolkit does not need this.
+`site-packages/nvidia/cu13/bin`; put that directory on PATH.
